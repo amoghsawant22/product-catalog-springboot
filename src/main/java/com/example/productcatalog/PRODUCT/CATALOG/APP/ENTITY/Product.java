@@ -35,7 +35,7 @@ public class Product {
     public void setName(String name) {
         this.name = name;
     }
-    public double getPrice(Double price){
+    public double getPrice(){
         return price;
     }
     public void setPrice(double price) {
