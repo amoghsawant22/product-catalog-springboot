@@ -4,9 +4,20 @@ import com.example.productcatalog.PRODUCT.CATALOG.APP.DTO.ProductDto;
 import com.example.productcatalog.PRODUCT.CATALOG.APP.ENTITY.Product;
 import com.example.productcatalog.PRODUCT.CATALOG.APP.REPOSITORY.ProductRepository;
 import com.example.productcatalog.PRODUCT.CATALOG.APP.SERVICE.ProductService;
+import exception.ResourceNotFoundException;
+import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import org.springframework.stereotype.Service;
 
+
 import java.util.List;
+
+
 
 @Service
 public class ProductServiceImplementation implements ProductService {
@@ -42,21 +53,34 @@ public class ProductServiceImplementation implements ProductService {
         return mapToDto(savedProduct);
     }
 
-
-
     @Override
     public List<ProductDto> getAllProducts(int page, int size) {
-        return List.of();
+        Pageable pageable = PageRequest.of(page,size);
+        Page<Product> productsPage = productRepository.findAll(pageable);
+        List<Product> products =  productsPage.getContent();
+
+        return products.stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
     @Override
     public ProductDto getById(Long id) {
-        return null;
+        Product product = productRepository.findById(id)
+        .orElseThrow(()-> new ResourceNotFoundException("Product not found with id:" +id));
+        return  mapToDto(product);
     }
 
     @Override
-    public ProductDto updateProduct(Long id, ProductDto productDto) {
-        return null;
+    public ProductDto updateProduct(Long id, ProductDto dto) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("product not found with the id"+id));
+        product.setCategory(dto.getCategory());
+        product.setName(dto.getName());
+        product.setPrice(dto.getPrice());
+
+        Product updatedProduct = productRepository.saveAndFlush(product);
+        return mapToDto(updatedProduct);
     }
 
     @Override
