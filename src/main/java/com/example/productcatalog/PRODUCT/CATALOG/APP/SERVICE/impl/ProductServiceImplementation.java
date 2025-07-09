@@ -5,9 +5,6 @@ import com.example.productcatalog.PRODUCT.CATALOG.APP.ENTITY.Product;
 import com.example.productcatalog.PRODUCT.CATALOG.APP.REPOSITORY.ProductRepository;
 import com.example.productcatalog.PRODUCT.CATALOG.APP.SERVICE.ProductService;
 import exception.ResourceNotFoundException;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -84,7 +81,9 @@ public class ProductServiceImplementation implements ProductService {
     }
 
     @Override
-    public ProductDto deleteProduct(Long id) {
-        return null;
+    public void deleteProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("product not found with the given id" + id));
+        productRepository.delete(product);
     }
 }
